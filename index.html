@@ -62,100 +62,6 @@
       <div class="outer">
         <section id="main">
   
-    <article id="post-writeup" class="article article-type-post" itemscope itemprop="blogPost">
-  <div class="article-meta">
-    <a href="/2019/07/25/writeup/" class="article-date">
-  <time datetime="2019-07-25T05:31:06.693Z" itemprop="datePublished">2019-07-25</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-    <div class="article-entry" itemprop="articleBody">
-      
-        <p>##Writeup Template</p>
-<p>###You can use this file as a template for your writeup if you want to submit it as a markdown file, but feel free to use some other method and submit a pdf if you prefer.</p>
-<hr>
-<p><strong>Vehicle Detection Project</strong></p>
-<p>The goals / steps of this project are the following:</p>
-<ul>
-<li>Perform a Histogram of Oriented Gradients (HOG) feature extraction on a labeled training set of images and train a classifier Linear SVM classifier</li>
-<li>Optionally, you can also apply a color transform and append binned color features, as well as histograms of color, to your HOG feature vector. </li>
-<li>Note: for those first two steps don’t forget to normalize your features and randomize a selection for training and testing.</li>
-<li>Implement a sliding-window technique and use your trained classifier to search for vehicles in images.</li>
-<li>Run your pipeline on a video stream (start with the test_video.mp4 and later implement on full project_video.mp4) and create a heat map of recurring detections frame by frame to reject outliers and follow detected vehicles.</li>
-<li>Estimate a bounding box for vehicles detected.</li>
-</ul>
-<h2 id="Rubric-Points"><a href="#Rubric-Points" class="headerlink" title="Rubric Points"></a><a href="https://review.udacity.com/#!/rubrics/513/view" target="_blank" rel="noopener">Rubric</a> Points</h2><p>###Here I will consider the rubric points individually and describe how I addressed each point in my implementation.  </p>
-<hr>
-<p>###Writeup / README</p>
-<p>####1. Provide a Writeup / README that includes all the rubric points and how you addressed each one.  You can submit your writeup as markdown or pdf.  <a href="https://github.com/udacity/CarND-Vehicle-Detection/blob/master/writeup_template.md" target="_blank" rel="noopener">Here</a> is a template writeup for this project you can use as a guide and a starting point.  </p>
-<p>You’re reading it!</p>
-<p>###Histogram of Oriented Gradients (HOG)</p>
-<p>####1. Explain how (and identify where in your code) you extracted HOG features from the training images.</p>
-<p>The code for extracted HOG features is in the line 68-79 of file “utils.py”</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># Define a function to return HOG features and visualization</span><br><span class="line">def get_hog_features(img, orient, pix_per_cell, cell_per_block, vis=False, feature_vec=True):</span><br><span class="line">    if vis == True:</span><br><span class="line">        features, hog_image = hog(img, orientations=orient, pixels_per_cell=(pix_per_cell, pix_per_cell),</span><br><span class="line">                                  cells_per_block=(cell_per_block, cell_per_block), transform_sqrt=False, </span><br><span class="line">                                  visualise=True, feature_vector=False)</span><br><span class="line">        return features, hog_image</span><br><span class="line">    else:      </span><br><span class="line">        features = hog(img, orientations=orient, pixels_per_cell=(pix_per_cell, pix_per_cell),</span><br><span class="line">                       cells_per_block=(cell_per_block, cell_per_block), transform_sqrt=False, </span><br><span class="line">                       visualise=False, feature_vector=feature_vec)</span><br><span class="line">        return features</span><br></pre></td></tr></table></figure>
-
-<p>I started by reading in all the <code>vehicle</code> and <code>non-vehicle</code> images.  Here is an example of one of each of the <code>vehicle</code> and <code>non-vehicle</code> classes:</p>
-<p><img src="./output_images/data_examples.png" alt="alt text"></p>
-<p>I then explored different color spaces and different <code>skimage.hog()</code> parameters (<code>orientations</code>, <code>pixels_per_cell</code>, and <code>cells_per_block</code>).  I grabbed random images from each of the two classes and displayed them to get a feel for what the <code>skimage.hog()</code> output looks like.</p>
-<p>Here is an example using the <code>RGB</code> color space and HOG parameters of <code>orientations=8</code>, <code>pixels_per_cell=(8, 8)</code> and <code>cells_per_block=(2, 2)</code>:</p>
-<p><img src="./output_images/hog.png" alt="alt text"></p>
-<p>####2. Explain how you settled on your final choice of HOG parameters.</p>
-<p>I tried various combinations of parameters to extract the features and use these features to train svm classfier, and pick the one that is perform best(have the highest test score)</p>
-<p>Here is my final parameters:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">colorspace = &apos;YUV&apos; # Can be RGB, HSV, LUV, HLS, YUV, YCrCb</span><br><span class="line">orient = 11</span><br><span class="line">pix_per_cell = 16</span><br><span class="line">cell_per_block = 2</span><br><span class="line">hog_channel = &apos;ALL&apos; # Can be 0, 1, 2, or &quot;ALL&quot;</span><br></pre></td></tr></table></figure>
-
-<p>####3. Describe how (and identify where in your code) you trained a classifier using your selected HOG features (and color features if you used them).<br>The code for trained a classifier is in the file “train.py”</p>
-<p>I trained a linear SVM using the default parameter with only the hog features, and get a accuracy of 0.98 on the test data set.</p>
-<p>###Sliding Window Search</p>
-<p>####1. Describe how (and identify where in your code) you implemented a sliding window search.  How did you decide what scales to search and how much to overlap windows?</p>
-<p>The code for implemented a sliding window search is in the line 25-192 of file “pipeline.py”</p>
-<p>I try out a lot of searching tatics and choose the conbination of 4 level sliding window:</p>
-<p>The level 1 have sliding window with 0.75 overlap and scales of 1.0, the sliding window look like:</p>
-<p><img src="./output_images/sliding_window_small.png" alt="alt text"></p>
-<p>The level 2 have sliding window with 0.75 overlap and scales of 1.5, the sliding window look like:</p>
-<p><img src="./output_images/sliding_window_medium1.png" alt="alt text"></p>
-<p>The level 3 have sliding window with 0.75 overlap and scales of 2.0, the sliding window look like:</p>
-<p><img src="./output_images/sliding_window_medium2.png" alt="alt text"></p>
-<p>The level 4 have sliding window with 0.75 overlap and scales of 3.5, the sliding window look like:</p>
-<p><img src="./output_images/sliding_window_large.png" alt="alt text"></p>
-<p>####2. Show some examples of test images to demonstrate how your pipeline is working.  What did you do to optimize the performance of your classifier?</p>
-<p>Extracting the hog features is time comsuming, for the performance of the classifier, I define the find_car method to etract the hog features once for each image, and use sub-sampling window to get the hog features to feat on the classifier.</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br></pre></td><td class="code"><pre><span class="line">def find_cars(img, ystart, ystop, scale, cspace, hog_channel, svc, X_scaler, orient,</span><br><span class="line">              pix_per_cell, cell_per_block, spatial_size, hist_bins, show_all_rectangles=False):</span><br><span class="line">    # array of rectangles where cars were detected</span><br><span class="line">    windows = []</span><br><span class="line"></span><br><span class="line">    img = img.astype(np.float32) / 255</span><br><span class="line"></span><br><span class="line">    img_tosearch = img[ystart:ystop, :, :]</span><br><span class="line"></span><br><span class="line">    # apply color conversion if other than &apos;RGB&apos;</span><br><span class="line">    if cspace != &apos;RGB&apos;:</span><br><span class="line">        if cspace == &apos;HSV&apos;:</span><br><span class="line">            ctrans_tosearch = cv2.cvtColor(img_tosearch, cv2.COLOR_RGB2HSV)</span><br><span class="line">        elif cspace == &apos;LUV&apos;:</span><br><span class="line">            ctrans_tosearch = cv2.cvtColor(img_tosearch, cv2.COLOR_RGB2LUV)</span><br><span class="line">        elif cspace == &apos;HLS&apos;:</span><br><span class="line">            ctrans_tosearch = cv2.cvtColor(img_tosearch, cv2.COLOR_RGB2HLS)</span><br><span class="line">        elif cspace == &apos;YUV&apos;:</span><br><span class="line">            ctrans_tosearch = cv2.cvtColor(img_tosearch, cv2.COLOR_RGB2YUV)</span><br><span class="line">        elif cspace == &apos;YCrCb&apos;:</span><br><span class="line">            ctrans_tosearch = cv2.cvtColor(img_tosearch, cv2.COLOR_RGB2YCrCb)</span><br><span class="line">    else:</span><br><span class="line">        ctrans_tosearch = np.copy(img)</span><br><span class="line"></span><br><span class="line">    # rescale image if other than 1.0 scale</span><br><span class="line">    if scale != 1:</span><br><span class="line">        imshape = ctrans_tosearch.shape</span><br><span class="line">        ctrans_tosearch = cv2.resize(ctrans_tosearch, (np.int(imshape[1] / scale), np.int(imshape[0] / scale)))</span><br><span class="line"></span><br><span class="line">    # select colorspace channel for HOG</span><br><span class="line">    if hog_channel == &apos;ALL&apos;:</span><br><span class="line">        ch1 = ctrans_tosearch[:, :, 0]</span><br><span class="line">        ch2 = ctrans_tosearch[:, :, 1]</span><br><span class="line">        ch3 = ctrans_tosearch[:, :, 2]</span><br><span class="line">    else:</span><br><span class="line">        ch1 = ctrans_tosearch[:, :, hog_channel]</span><br><span class="line"></span><br><span class="line">    # Define blocks and steps as above</span><br><span class="line">    nxblocks = (ch1.shape[1] // pix_per_cell) + 1  # -1</span><br><span class="line">    nyblocks = (ch1.shape[0] // pix_per_cell) + 1  # -1</span><br><span class="line">    nfeat_per_block = orient * cell_per_block ** 2</span><br><span class="line">    # 64 was the orginal sampling rate, with 8 cells and 8 pix per cell</span><br><span class="line">    window = 64</span><br><span class="line">    nblocks_per_window = (window // pix_per_cell) - 1</span><br><span class="line">    cells_per_step = 2  # Instead of overlap, define how many cells to step</span><br><span class="line">    nxsteps = (nxblocks - nblocks_per_window) // cells_per_step</span><br><span class="line">    nysteps = (nyblocks - nblocks_per_window) // cells_per_step</span><br><span class="line"></span><br><span class="line">    # Compute individual channel HOG features for the entire image</span><br><span class="line">    hog1 = utils.get_hog_features(ch1, orient, pix_per_cell, cell_per_block, feature_vec=False)</span><br><span class="line">    if hog_channel == &apos;ALL&apos;:</span><br><span class="line">        hog2 = utils.get_hog_features(ch2, orient, pix_per_cell, cell_per_block, feature_vec=False)</span><br><span class="line">        hog3 = utils.get_hog_features(ch3, orient, pix_per_cell, cell_per_block, feature_vec=False)</span><br><span class="line"></span><br><span class="line">    for xb in range(nxsteps):</span><br><span class="line">        for yb in range(nysteps):</span><br><span class="line">            ypos = yb * cells_per_step</span><br><span class="line">            xpos = xb * cells_per_step</span><br><span class="line">            # Extract HOG for this patch</span><br><span class="line">            hog_feat1 = hog1[ypos:ypos + nblocks_per_window, xpos:xpos + nblocks_per_window].ravel()</span><br><span class="line">            if hog_channel == &apos;ALL&apos;:</span><br><span class="line">                hog_feat2 = hog2[ypos:ypos + nblocks_per_window, xpos:xpos + nblocks_per_window].ravel()</span><br><span class="line">                hog_feat3 = hog3[ypos:ypos + nblocks_per_window, xpos:xpos + nblocks_per_window].ravel()</span><br><span class="line">                hog_features = np.hstack((hog_feat1, hog_feat2, hog_feat3))</span><br><span class="line">            else:</span><br><span class="line">                hog_features = hog_feat1</span><br><span class="line"></span><br><span class="line">            xleft = xpos * pix_per_cell</span><br><span class="line">            ytop = ypos * pix_per_cell</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">            test_prediction = svc.predict(hog_features)</span><br><span class="line"></span><br><span class="line">            if test_prediction == 1 or show_all_rectangles:</span><br><span class="line">                xbox_left = np.int(xleft * scale)</span><br><span class="line">                ytop_draw = np.int(ytop * scale)</span><br><span class="line">                win_draw = np.int(window * scale)</span><br><span class="line">                windows.append(</span><br><span class="line">                    ((xbox_left, ytop_draw + ystart), (xbox_left + win_draw, ytop_draw + win_draw + ystart)))</span><br><span class="line"></span><br><span class="line">    return windows</span><br></pre></td></tr></table></figure>
-
-<p>Ultimately I searched on 4 scales using YUV 3-channel HOG features, which provided a nice result.  Here are the result on the test image:</p>
-<p><img src="./output_images/window_all.png" alt="alt text"></p>
-<hr>
-<h3 id="Video-Implementation"><a href="#Video-Implementation" class="headerlink" title="Video Implementation"></a>Video Implementation</h3><p>####1. Provide a link to your final video output.  Your pipeline should perform reasonably well on the entire project video (somewhat wobbly or unstable bounding boxes are ok as long as you are identifying the vehicles most of the time with minimal false positives.)</p>
-<p>Here’s a <a href="./vedio_out/project_video_out.mp4">link to my video result</a></p>
-<p>####2. Describe how (and identify where in your code) you implemented some kind of filter for false positives and some method for combining overlapping bounding boxes.</p>
-<p>I recorded the positions of positive detections in each frame of the video.  From the positive detections I created a heatmap and then thresholded that map to identify vehicle positions.  I then used <code>scipy.ndimage.measurements.label()</code> to identify individual blobs in the heatmap.  I then assumed each blob corresponded to a vehicle.  I constructed bounding boxes to cover the area of each blob detected.  </p>
-<p>Here’s an example result showing the heatmap from the test images, the result of <code>scipy.ndimage.measurements.label()</code> and the bounding boxes that overlaid on the images:</p>
-<p>The hotmap:<br><img src="./output_images/hot.png" alt="alt text"></p>
-<p>Here is the output of <code>scipy.ndimage.measurements.label()</code> on the integrated heatmap:<br><img src="./output_images/lables.png" alt="alt text"></p>
-<p>Here the resulting bounding boxes are drawn onto the test images:<br><img src="./output_images/result_on_test.png" alt="alt text"></p>
-<hr>
-<p>###Discussion</p>
-<p>####1. Briefly discuss any problems / issues you faced in your implementation of this project.  Where will your pipeline likely fail?  What could you do to make it more robust?</p>
-<p>The main problems I face in your implementation of this project is find the right combination of sliding window search tatics. It took me a lot of time to try difference tatics and get the final result.</p>
-<p>My pipeline may fail on condition where a lot of car on the street, where the positive detections boxes on each car will probably pile up on each other. And in the condition like fog, rain where the shape of a car can’t be properly capture, my classifier may not capable to make the right prediction. </p>
-<p>Use the both the color features and hog features to train the classifer could improve the accuracy of prediction under more complicate condition. And make my pipeline more robust.</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/07/25/writeup/" data-id="cjyi8op5t0002xouaxdcr7wsp" class="article-share-link">Share</a>
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-  
     <article id="post-cty" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/07/24/cty/" class="article-date">
@@ -183,7 +89,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/07/24/cty/" data-id="cjyi8op5d0000xouas8z565dt" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/07/24/cty/" data-id="cjyi97tb6000078uan5onfzoj" class="article-share-link">Share</a>
       
       
     </footer>
@@ -211,7 +117,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/07/24/first-blog/" data-id="cjyi8op5k0001xouan27mjdc4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/07/24/first-blog/" data-id="cjyi97tbe000178uar9h5rowq" class="article-share-link">Share</a>
       
       
     </footer>
@@ -260,7 +166,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/07/24/hello-world/" data-id="cjyi8op5v0003xoualmtdzk4h" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/07/24/hello-world/" data-id="cjyi97tbi000278uapv1q4lpe" class="article-share-link">Share</a>
       
       
     </footer>
@@ -299,10 +205,6 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
-        
-          <li>
-            <a href="/2019/07/25/writeup/">(no title)</a>
-          </li>
         
           <li>
             <a href="/2019/07/24/cty/">ctydfhxdnbzdfnbzdf</a>
