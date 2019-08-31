@@ -8,7 +8,7 @@
       <link href="/2019/08/31/8-ending/"/>
       <url>/2019/08/31/8-ending/</url>
       
-        <content type="html"><![CDATA[<p><strong>八月最后一周总结</strong></p><p><strong>一、tensorflow知识总结</strong></p><ul><li><p>1、tensorflow的数据类型</p><blockquote><p>张量</p></blockquote></li><li><p>2、tensorflow的函数求和、求均值、loss优化器</p><blockquote><p>优化器</p></blockquote></li><li><p>3、占位符的使用</p><blockquote><p>多个值使用列表[]</p></blockquote></li><li><p>4、输出softmax函数</p><blockquote><p>函数的用法</p></blockquote></li><li><p>5、神经网格过拟合的处理</p><blockquote><p>L2、L1正则化的处理方法以及概念</p></blockquote><blockquote><p>如何使用Dropout解决过拟合</p></blockquote></li><li><p>6、使用tensorboard可视化训练过程</p><blockquote><p>使用的方法</p></blockquote></li><li><p>7、如何理解CNN中步长、卷积核、pading的定义</p><blockquote><p>使用方法</p></blockquote></li><li><p>8、池化的作用和原理</p><blockquote><p>如何定义池化</p></blockquote></li><li><p>9、compute_accuracy这个函数的意思</p></li></ul>]]></content>
+        <content type="html"><![CDATA[<p>每周总结   —- 点点滴滴</p><a id="more"></a><p><strong>八月最后一周总结</strong></p><p><strong>一、tensorflow知识总结</strong></p><ul><li><p>1、tensorflow的数据类型</p><blockquote><p>张量</p></blockquote></li><li><p>2、tensorflow的函数求和、求均值、loss优化器</p><blockquote><p>优化器</p></blockquote></li><li><p>3、占位符的使用</p><blockquote><p>多个值使用列表[]</p></blockquote></li><li><p>4、输出softmax函数</p><blockquote><p>函数的用法</p></blockquote></li><li><p>5、神经网格过拟合的处理</p><blockquote><p>L2、L1正则化的处理方法以及概念</p></blockquote><blockquote><p>如何使用Dropout解决过拟合</p></blockquote></li><li><p>6、使用tensorboard可视化训练过程</p><blockquote><p>使用的方法</p></blockquote></li><li><p>7、如何理解CNN中步长、卷积核、pading的定义</p><blockquote><p>使用方法</p></blockquote></li><li><p>8、池化的作用和原理</p><blockquote><p>如何定义池化</p></blockquote></li><li><p>9、compute_accuracy这个函数的意思</p></li></ul>]]></content>
       
       
       
